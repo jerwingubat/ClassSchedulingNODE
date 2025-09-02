@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Class Scheduling System</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="styles.css">
+    <!-- Firebase SDKs (Compat for simplicity) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+	<header class="app-header">
+		<div class="container bar">
+			<h1>Class Scheduling System</h1>
+			<div class="header-actions">
+				<select id="departmentSelect" title="Select Department">
+					<option value="" disabled selected>Select Department</option>
+				</select>
+				<input id="newDepartment" type="text" placeholder="Add department" style="min-width:160px">
+				<button id="addDepartmentBtn" type="button" title="Add department">Add</button>
+				<!-- <a href="auth.html" class="btn" style="background:#67C090; color:#124170; border:1px solid #26667F;">Login / Signup</a> -->
+				<!-- <button id="saveBtn" title="Save to browser">Save</button> -->
+				<!-- <button id="loadBtn" title="Load from browser">Load</button> -->
+				<!-- <button id="clearBtn" title="Clear all data">Clear</button> -->
+				<button id="printBtn" title="Print or export to PDF">Print</button>
+			</div>
+		</div>
+	</header>
+
+	<main class="app-main">
+		<section class="panel">
+			<h2>Rooms</h2>
+			<form id="roomForm" class="form-inline">
+				<input id="roomName" type="text" placeholder="Room name (e.g., LEC-101)" required>
+				<select id="roomType" required>
+					<option value="" disabled selected>Type</option>
+					<option value="lecture">Lecture room</option>
+					<option value="laboratory">Laboratory room</option>
+				</select>
+				<button type="submit">Add</button>
+			</form>
+			<ul id="roomList" class="list"></ul>
+		</section>
+		<section class="panel">
+			<h2>Teachers</h2>
+			<form id="teacherForm" class="form-inline">
+				<input id="teacherName" type="text" placeholder="Teacher name" required>
+				<button type="submit">Add</button>
+			</form>
+			<ul id="teacherList" class="list"></ul>
+		</section>
+
+
+
+		<section class="panel">
+			<h2>Subjects</h2>
+			<form id="subjectForm" class="form-grid">
+				<input id="subjectName" type="text" placeholder="Subject name" required>
+				<input id="subjectSection" type="text" placeholder="Section (e.g., BSCS-1A)">
+				<select id="subjectUnits" required>
+					<option value="" disabled selected>Units</option>
+					<option value="1">1 unit lab (3h laboratory)</option>
+					<option value="3">2 units lecture + 1 unit lab (2h lec + 3h lab)</option>
+					<option value="4">3 units lecture (3h lecture)</option>
+				</select>
+				<select id="subjectTeacher" required>
+					<option value="" disabled selected>Assign teacher</option>
+				</select>
+				<button type="submit">Add</button>
+			</form>
+			<ul id="subjectList" class="list"></ul>
+		</section>
+
+		<section class="panel">
+			<div class="panel-header">
+				<h2>Scheduler</h2>
+				<div class="controls">
+					<select id="viewMode">
+						<option value="all">All</option>
+						<!-- <option value="by-teacher">By Teacher</option> -->
+						<option value="teachers-all">All Teachers (separate tables)</option>
+						<!-- <option value="by-subject">By Subject</option> -->
+					</select>
+					<select id="viewFilter" disabled>
+						<option value="">Select filter</option>
+					</select>
+					<button id="generateBtn">Generate Schedule</button>
+				</div>
+			</div>
+
+			<div id="loadingSpinner" class="loading-spinner" style="display: none;">
+				<div class="spinner"></div>
+				<p>Generating optimal schedule...</p>
+			</div>
+
+			<div id="timetable" class="timetable"></div>
+		</section>
+
+		<!-- Print Modal -->
+		<div id="printModal" class="modal" style="display:none;">
+			<div class="modal-backdrop"></div>
+			<div class="modal-content">
+				<h3>Select Teacher to Print</h3>
+				<select id="printTeacherSelect">
+					<option value="" disabled selected>Select a teacher</option>
+				</select>
+				<div class="modal-actions">
+					<button id="printCancelBtn">Cancel</button>
+					<button id="printConfirmBtn">Print</button>
+				</div>
+			</div>
+		</div>
+	</main>
+
+	<footer class="app-footer">
+		<div class="container">
+			<small>This application is a prototype intended for testing purposes. Developed by <a class="link" href="https://jerwingubatportfolio.vercel.app/">Jerwin Gubat</a></small>
+		</div>
+	</footer>
+
+	<script src="js/api.js"></script>
+	<script src="app-new.js"></script>
+</body>
+</html>
+

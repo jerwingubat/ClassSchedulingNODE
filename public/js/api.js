@@ -1,4 +1,3 @@
-// API client for communicating with the backend
 class ApiClient {
   constructor(baseUrl = '/api') {
     this.baseUrl = baseUrl;
@@ -33,7 +32,6 @@ class ApiClient {
     }
   }
 
-  // Teachers API
   async getTeachers(department) {
     const params = department ? `?department=${encodeURIComponent(department)}` : '';
     return this.request(`/teachers${params}`);
@@ -68,7 +66,6 @@ class ApiClient {
     return this.request(`/teachers/${id}/weekly-hours${params}`);
   }
 
-  // Subjects API
   async getSubjects(department) {
     const params = department ? `?department=${encodeURIComponent(department)}` : '';
     return this.request(`/subjects${params}`);
@@ -109,8 +106,6 @@ class ApiClient {
     const params = department ? `?department=${encodeURIComponent(department)}` : '';
     return this.request(`/subjects/teacher/${teacherId}${params}`);
   }
-
-  // Departments API
   async getDepartments() {
     return this.request('/departments');
   }
@@ -139,7 +134,6 @@ class ApiClient {
     });
   }
 
-  // Rooms API
   async getRooms(department) {
     const params = department ? `?department=${encodeURIComponent(department)}` : '';
     return this.request(`/rooms${params}`);
@@ -174,7 +168,6 @@ class ApiClient {
     return this.request(`/rooms/type/${type}${params}`);
   }
 
-  // Schedules API
   async getSchedules(department) {
     const params = department ? `?department=${encodeURIComponent(department)}` : '';
     return this.request(`/schedules${params}`);
@@ -199,11 +192,9 @@ class ApiClient {
     });
   }
 
-  // Health check
   async healthCheck() {
     return this.request('/health');
   }
 }
 
-// Create global API client instance
 window.apiClient = new ApiClient();

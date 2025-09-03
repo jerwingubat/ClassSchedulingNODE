@@ -6,13 +6,11 @@ const { computeTeacherWeeklyHours } = require('../utils/scheduling');
 
 const router = express.Router();
 
-// Validation schemas
 const teacherSchema = Joi.object({
   name: Joi.string().min(1).max(100).required(),
   department: Joi.string().max(50).optional()
 });
 
-// Get all teachers for a department
 router.get('/', async (req, res, next) => {
   try {
     const { department } = req.query;
@@ -35,7 +33,6 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-// Get a specific teacher
 router.get('/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -51,7 +48,6 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
-// Create a new teacher
 router.post('/', async (req, res, next) => {
   try {
     const { error, value } = teacherSchema.validate(req.body);
@@ -77,7 +73,6 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-// Update a teacher
 router.put('/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -101,18 +96,15 @@ router.put('/:id', async (req, res, next) => {
   }
 });
 
-// Delete a teacher
 router.delete('/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
     
-    // Check if teacher exists
     const teacherDoc = await db.collection('teachers').doc(id).get();
     if (!teacherDoc.exists) {
       return res.status(404).json({ error: 'Teacher not found' });
     }
     
-    // Remove teacher assignments from subjects
     const subjectsSnapshot = await db.collection('subjects')
       .where('teacherId', '==', id)
       .get();
@@ -122,7 +114,6 @@ router.delete('/:id', async (req, res, next) => {
       batch.update(doc.ref, { teacherId: '' });
     });
     
-    // Delete the teacher
     batch.delete(db.collection('teachers').doc(id));
     
     await batch.commit();
@@ -133,13 +124,11 @@ router.delete('/:id', async (req, res, next) => {
   }
 });
 
-// Get teacher's weekly hours
 router.get('/:id/weekly-hours', async (req, res, next) => {
   try {
     const { id } = req.params;
     const { department } = req.query;
     
-    // Get all subjects for this teacher
     let subjectsQuery = db.collection('subjects').where('teacherId', '==', id);
     if (department) {
       subjectsQuery = subjectsQuery.where('department', '==', department);

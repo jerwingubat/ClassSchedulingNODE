@@ -5,7 +5,6 @@ const { generateSchedule } = require('../utils/scheduling');
 
 const router = express.Router();
 
-// Get all schedules for a department
 router.get('/', async (req, res, next) => {
   try {
     const { department } = req.query;
@@ -28,7 +27,6 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-// Get schedule for a specific teacher
 router.get('/teacher/:teacherId', async (req, res, next) => {
   try {
     const { teacherId } = req.params;
@@ -52,7 +50,6 @@ router.get('/teacher/:teacherId', async (req, res, next) => {
   }
 });
 
-// Generate new schedule
 router.post('/generate', async (req, res, next) => {
   try {
     const { department } = req.body;
@@ -60,8 +57,7 @@ router.post('/generate', async (req, res, next) => {
     if (!department) {
       return res.status(400).json({ error: 'Department is required' });
     }
-    
-    // Fetch all data needed for scheduling
+
     const [teachersSnapshot, subjectsSnapshot, roomsSnapshot] = await Promise.all([
       db.collection('teachers').where('department', '==', department).get(),
       db.collection('subjects').where('department', '==', department).get(),
@@ -89,14 +85,11 @@ router.post('/generate', async (req, res, next) => {
         error: 'Cannot generate schedule. Need at least one teacher and one subject.' 
       });
     }
-    
-    // Generate the schedule
+
     const allocations = generateSchedule(subjects, teachers, rooms, department);
-    
-    // Save schedules to Firestore
+
     await persistSchedulesToFirestore(allocations, subjects, teachers, rooms, department);
-    
-    // Return the generated schedule
+
     res.json({
       message: 'Schedule generated successfully',
       allocations,
@@ -111,7 +104,6 @@ router.post('/generate', async (req, res, next) => {
   }
 });
 
-// Delete all schedules for a department
 router.delete('/', async (req, res, next) => {
   try {
     const { department } = req.query;
@@ -139,7 +131,6 @@ router.delete('/', async (req, res, next) => {
   }
 });
 
-// Helper function to persist schedules to Firestore
 async function persistSchedulesToFirestore(allocations, subjects, teachers, rooms, department) {
   const schedulesCol = db.collection('schedules');
   const byTeacher = new Map();
@@ -163,14 +154,12 @@ async function persistSchedulesToFirestore(allocations, subjects, teachers, room
   });
   
   const batch = db.batch();
-  
-  // Clear existing schedules for this department
+
   const existingSchedules = await schedulesCol.where('department', '==', department).get();
   existingSchedules.forEach(doc => {
     batch.delete(doc.ref);
   });
   
-  // Add new schedules
   byTeacher.forEach((items, teacherId) => {
     if (!teacherId) return;
     const docId = `${department}__${teacherId}`;

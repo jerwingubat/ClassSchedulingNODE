@@ -1,7 +1,6 @@
 const admin = require('firebase-admin');
 require('dotenv').config();
 
-// Initialize Firebase Admin SDK
 const firebaseConfig = {
   projectId: process.env.FIREBASE_PROJECT_ID,
   privateKeyId: process.env.FIREBASE_PRIVATE_KEY_ID,
@@ -14,7 +13,6 @@ const firebaseConfig = {
   clientX509CertUrl: process.env.FIREBASE_CLIENT_X509_CERT_URL,
 };
 
-// Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(firebaseConfig),

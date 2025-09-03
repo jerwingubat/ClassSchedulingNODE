@@ -68,27 +68,22 @@ function assignRoomForAllocation(allocation, allocations, rooms, selectedDepartm
 function placeBlock(subject, block, teacherBusy, subjectDayUsed, subjects, teachers) {
   const teacherId = subject.teacherId || "";
   
-  // Calculate teacher's weekly hours to determine if they should be morning-only
   const teacherWeeklyHours = computeTeacherWeeklyHours(teacherId, subjects);
   const isMorningOnly = teacherWeeklyHours <= 16;
-  
-  // Define morning hours (7am-11am) and afternoon hours (12pm onwards)
-  const MORNING_HOURS = [7, 8, 9, 10, 11]; // 7am-11am
-  const AFTERNOON_HOURS = [12, 13, 14, 15, 16, 17, 18, 19]; // 12pm-7pm
-  
-  // Determine which hours to use based on teacher's weekly hours
+
+  const MORNING_HOURS = [7, 8, 9, 10, 11];
+  const AFTERNOON_HOURS = [12, 13, 14, 15, 16, 17, 18, 19];
+
   const availableHours = isMorningOnly ? MORNING_HOURS : HOURS;
   
   for (const day of DAYS) {
     if (subjectDayUsed && subjectDayUsed.get(subject.id)?.has(day)) continue;
-    
-    // Filter available hours based on teacher's weekly hours constraint
+  
     const validStartHours = availableHours.filter(h => h <= availableHours[availableHours.length - 1] - block.hours + 1);
     
     for (const start of validStartHours) {
       const hours = Array.from({ length: block.hours }, (_, k) => start + k);
-      
-      // Check if all hours fall within the allowed time range
+
       const allHoursValid = hours.every(h => availableHours.includes(h));
       if (!allHoursValid) continue;
       
@@ -173,10 +168,10 @@ function evaluateCost(allocations, subjects, teachers, rooms) {
       for (const h of hours) {
         const c = (rHours.get(h) || 0) + 1;
         rHours.set(h, c);
-        if (c > 1) cost += 1200; // room conflict penalty
+        if (c > 1) cost += 1200;
       }
     } else {
-      cost += 1500; // missing room assignment
+      cost += 1500;
     }
     const subj = subjects.find(s => s.id === a.subjectId);
     if (subj) {
@@ -328,15 +323,12 @@ function mutateAllocations(ind, subjects, rooms, selectedDepartment) {
     const gene = out[idx];
     if (gene.unscheduled) continue;
     
-    // Calculate teacher's weekly hours to determine if they should be morning-only
     const teacherWeeklyHours = computeTeacherWeeklyHours(gene.teacherId, subjects);
     const isMorningOnly = teacherWeeklyHours <= 16;
+
+    const MORNING_HOURS = [7, 8, 9, 10, 11];
+    const AFTERNOON_HOURS = [12, 13, 14, 15, 16, 17, 18, 19];
     
-    // Define morning hours (7am-11am) and afternoon hours (12pm onwards)
-    const MORNING_HOURS = [7, 8, 9, 10, 11]; // 7am-11am
-    const AFTERNOON_HOURS = [12, 13, 14, 15, 16, 17, 18, 19]; // 12pm-7pm
-    
-    // Determine which hours to use based on teacher's weekly hours
     const availableHours = isMorningOnly ? MORNING_HOURS : HOURS;
     
     if (Math.random() < 0.5) gene.day = DAYS[Math.floor(Math.random() * DAYS.length)];
@@ -352,15 +344,12 @@ function randomizeAllocations(base, subjects, rooms, selectedDepartment) {
   return base.map(a => {
     const copy = { ...a };
     if (copy.unscheduled || !copy.day || copy.startHour < 0) {
-      // Calculate teacher's weekly hours to determine if they should be morning-only
       const teacherWeeklyHours = computeTeacherWeeklyHours(copy.teacherId, subjects);
       const isMorningOnly = teacherWeeklyHours <= 16;
       
-      // Define morning hours (7am-11am) and afternoon hours (12pm onwards)
-      const MORNING_HOURS = [7, 8, 9, 10, 11]; // 7am-11am
-      const AFTERNOON_HOURS = [12, 13, 14, 15, 16, 17, 18, 19]; // 12pm-7pm
+      const MORNING_HOURS = [7, 8, 9, 10, 11];
+      const AFTERNOON_HOURS = [12, 13, 14, 15, 16, 17, 18, 19];
       
-      // Determine which hours to use based on teacher's weekly hours
       const availableHours = isMorningOnly ? MORNING_HOURS : HOURS;
       
       const latest = availableHours[availableHours.length - 1] - (copy.duration - 1);

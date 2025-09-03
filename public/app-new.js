@@ -1,4 +1,3 @@
-// Updated frontend application using API endpoints
 const state = {
 	teachers: [],
 	subjects: [],
@@ -7,7 +6,6 @@ const state = {
 	rooms: [],
 };
 
-// DOM elements
 const departmentSelect = document.getElementById("departmentSelect");
 const newDepartment = document.getElementById("newDepartment");
 const addDepartmentBtn = document.getElementById("addDepartmentBtn");
@@ -47,7 +45,6 @@ const bulkClearBtn = document.getElementById("bulkClearBtn");
 
 let latestRemoteAllocations = [];
 
-// Utility functions
 function showError(message) {
 	alert(`Error: ${message}`);
 }
@@ -70,19 +67,16 @@ function hideLoading(element, originalText) {
 	}
 }
 
-// Load all data from API
 async function loadAll() {
 	try {
-		// Load departments
 		const departments = await apiClient.getDepartments();
+		console.log("Loaded departments:", departments);
 		state.departments = departments;
 		
-		// Set default department if none selected
 		if (!state.selectedDepartment && departments.length > 0) {
 			state.selectedDepartment = departments[0].id;
 		}
 		
-		// Load data for selected department
 		await loadDepartmentData();
 		
 		renderAll();
@@ -92,7 +86,6 @@ async function loadAll() {
 	}
 }
 
-// Load data for the selected department
 async function loadDepartmentData() {
 	if (!state.selectedDepartment) return;
 	
@@ -108,7 +101,6 @@ async function loadDepartmentData() {
 		state.subjects = subjects;
 		state.rooms = rooms;
 		
-		// Process schedules
 		latestRemoteAllocations = [];
 		schedules.forEach(schedule => {
 			if (schedule.items && Array.isArray(schedule.items)) {
@@ -122,13 +114,11 @@ async function loadDepartmentData() {
 	}
 }
 
-// Render functions
 function renderTeachers() {
 	if (!teacherList) return;
 	
 	teacherList.innerHTML = "";
 	
-	// Update department select
 	if (departmentSelect) {
 		departmentSelect.innerHTML = `<option value="" disabled ${state.selectedDepartment ? "" : "selected"}>Select Department</option>`;
 		state.departments.forEach(d => {
@@ -321,7 +311,6 @@ function renderAll() {
 	renderRooms();
 }
 
-// Import scheduling functions from the original app
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
 const HOURS = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
 
@@ -515,8 +504,8 @@ function buildGridTable(allocations) {
 	table.appendChild(tbody);
 	return table;
 }
+  
 
-// Event listeners
 if (teacherForm) {
 	teacherForm.addEventListener("submit", async (e) => {
 		e.preventDefault();
@@ -718,7 +707,6 @@ function renderScheduleOnly() {
 	}
 }
 
-// Print functionality
 function openPrintModal() {
 	if (!printModal || !printTeacherSelect) return;
 	printTeacherSelect.innerHTML = `<option value="" disabled selected>Select a teacher</option>`;
@@ -922,7 +910,6 @@ if (printConfirmBtn) {
 	});
 }
 
-// Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
 	loadAll();
 });

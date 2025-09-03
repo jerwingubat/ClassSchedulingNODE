@@ -5,14 +5,12 @@ const { uid, expandRoomRange } = require('../utils/helpers');
 
 const router = express.Router();
 
-// Validation schema
 const roomSchema = Joi.object({
   name: Joi.string().min(1).max(100).required(),
   type: Joi.string().valid('lecture', 'laboratory').required(),
   department: Joi.string().max(50).optional()
 });
 
-// Get all rooms for a department
 router.get('/', async (req, res, next) => {
   try {
     const { department } = req.query;
@@ -35,7 +33,6 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-// Get a specific room
 router.get('/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -51,7 +48,6 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
-// Create a new room
 router.post('/', async (req, res, next) => {
   try {
     const { error, value } = roomSchema.validate(req.body);
@@ -60,8 +56,7 @@ router.post('/', async (req, res, next) => {
     }
     
     const { name, type, department } = value;
-    
-    // Expand room range if provided
+
     const roomNames = expandRoomRange(name);
     const createdRooms = [];
     
@@ -86,7 +81,6 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-// Update a room
 router.put('/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -111,12 +105,10 @@ router.put('/:id', async (req, res, next) => {
   }
 });
 
-// Delete a room
 router.delete('/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
-    
-    // Check if room exists
+
     const roomDoc = await db.collection('rooms').doc(id).get();
     if (!roomDoc.exists) {
       return res.status(404).json({ error: 'Room not found' });
@@ -130,7 +122,6 @@ router.delete('/:id', async (req, res, next) => {
   }
 });
 
-// Get rooms by type
 router.get('/type/:type', async (req, res, next) => {
   try {
     const { type } = req.params;

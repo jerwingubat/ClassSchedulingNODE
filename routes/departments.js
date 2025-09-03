@@ -4,12 +4,10 @@ const { db } = require('../config/firebase');
 
 const router = express.Router();
 
-// Validation schema
 const departmentSchema = Joi.object({
   name: Joi.string().min(1).max(100).required()
 });
 
-// Get all departments
 router.get('/', async (req, res, next) => {
   try {
     const snapshot = await db.collection('departments').get();
@@ -25,7 +23,6 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-// Get a specific department
 router.get('/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -41,7 +38,7 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
-// Create a new department
+
 router.post('/', async (req, res, next) => {
   try {
     const { error, value } = departmentSchema.validate(req.body);
@@ -52,7 +49,6 @@ router.post('/', async (req, res, next) => {
     const { name } = value;
     const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     
-    // Check if department already exists
     const existingDoc = await db.collection('departments').doc(id).get();
     if (existingDoc.exists) {
       return res.status(409).json({ error: 'Department already exists' });
@@ -73,7 +69,6 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-// Update a department
 router.put('/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -96,7 +91,6 @@ router.put('/:id', async (req, res, next) => {
   }
 });
 
-// Delete a department
 router.delete('/:id', async (req, res, next) => {
   try {
     const { id } = req.params;

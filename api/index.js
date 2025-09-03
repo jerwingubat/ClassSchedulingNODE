@@ -15,24 +15,24 @@ const schedulesRoutes = require('../routes/schedules');
 
 const app = express();
 
-// Security middleware
+//security middleware
 app.use(helmet());
 
-// Rate limiting
+//rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   message: 'Too many requests from this IP, please try again later.'
 });
 app.use('/api/', limiter);
 
-// CORS configuration - allow all origins for Vercel deployment
+//CORS config- allow all origins for vercel deployment
 app.use(cors({
   origin: true,
   credentials: true
 }));
 
-// Body parsing middleware
+//middleware body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -43,7 +43,6 @@ app.use('/api/departments', departmentsRoutes);
 app.use('/api/rooms', roomsRoutes);
 app.use('/api/schedules', schedulesRoutes);
 
-// Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
@@ -52,7 +51,6 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Error:', err);
   res.status(err.status || 500).json({
@@ -63,7 +61,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler
 app.use('*', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });

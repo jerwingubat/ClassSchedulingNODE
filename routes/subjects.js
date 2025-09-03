@@ -5,7 +5,6 @@ const { uid, expandSectionRange, parseBulkInput } = require('../utils/helpers');
 
 const router = express.Router();
 
-// Validation schemas
 const subjectSchema = Joi.object({
   name: Joi.string().min(1).max(100).required(),
   section: Joi.string().max(20).optional().allow(''),
@@ -18,8 +17,6 @@ const bulkImportSchema = Joi.object({
   text: Joi.string().min(1).required(),
   department: Joi.string().max(50).optional()
 });
-
-// Get all subjects for a department
 router.get('/', async (req, res, next) => {
   try {
     const { department } = req.query;
@@ -42,7 +39,6 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-// Get a specific subject
 router.get('/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -58,7 +54,6 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
-// Create a new subject
 router.post('/', async (req, res, next) => {
   try {
     const { error, value } = subjectSchema.validate(req.body);
@@ -67,8 +62,7 @@ router.post('/', async (req, res, next) => {
     }
     
     const { name, section, units, teacherId, department } = value;
-    
-    // Expand section range if provided
+
     const sections = expandSectionRange(section);
     const createdSubjects = [];
     
@@ -95,7 +89,6 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-// Update a subject
 router.put('/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -122,12 +115,10 @@ router.put('/:id', async (req, res, next) => {
   }
 });
 
-// Delete a subject
 router.delete('/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
     
-    // Check if subject exists
     const subjectDoc = await db.collection('subjects').doc(id).get();
     if (!subjectDoc.exists) {
       return res.status(404).json({ error: 'Subject not found' });
@@ -141,7 +132,6 @@ router.delete('/:id', async (req, res, next) => {
   }
 });
 
-// Bulk import subjects
 router.post('/bulk-import', async (req, res, next) => {
   try {
     const { error, value } = bulkImportSchema.validate(req.body);
@@ -154,7 +144,7 @@ router.post('/bulk-import', async (req, res, next) => {
     const createdSubjects = [];
     
     for (const subjectData of subjectsToAdd) {
-      // Check if teacher exists, if not create it
+
       let teacherId = '';
       if (subjectData.teacherName) {
         const teacherSnapshot = await db.collection('teachers')
@@ -164,7 +154,7 @@ router.post('/bulk-import', async (req, res, next) => {
           .get();
         
         if (teacherSnapshot.empty) {
-          // Create new teacher
+
           const newTeacherId = uid();
           await db.collection('teachers').doc(newTeacherId).set({
             id: newTeacherId,
@@ -179,7 +169,6 @@ router.post('/bulk-import', async (req, res, next) => {
         }
       }
       
-      // Check if subject already exists
       const existingSubjectSnapshot = await db.collection('subjects')
         .where('name', '==', subjectData.name)
         .where('teacherId', '==', teacherId)
@@ -216,7 +205,6 @@ router.post('/bulk-import', async (req, res, next) => {
   }
 });
 
-// Get subjects by teacher
 router.get('/teacher/:teacherId', async (req, res, next) => {
   try {
     const { teacherId } = req.params;
